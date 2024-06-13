@@ -11,6 +11,16 @@ public class Sketch extends PApplet {
   int[] intCorrectAnswersHistory;
   int intQuestionNumber;
 
+  int intScore;
+
+  String[] strGeographyQuestions;
+  String[][] strGeographyOptions;
+  int[] intCorrectAnswerGeography;
+
+  int intPage = 0;
+  int intHistoryOrGeography = 0; // 0 - history; 1 - geography
+  int intTimer = 0;
+
   /**
    * Called once at the beginning of execution, put your size call here
    */
@@ -63,27 +73,132 @@ public class Sketch extends PApplet {
 
     // set question number to 0
     intQuestionNumber = 0;
+
+    // array for the answers of the geography questions
+    strGeographyQuestions = new String[] {
+      "What is the capital city of Australia?",
+      "Which river is the longest in the world?",
+      "Mount Kilimanjaro is located in which country?",
+      "What is the smallest country in the world by land area?",
+      "Which desert is the largest in the world?",
+      "Which ocean is the deepest in the world?",
+      "What is the official language of Brazil?",
+      "The Great Barrier Reef is located off the coast of which Australian state?",
+      "Which country has the largest population in the world?",
+      "What is the highest mountain in North America?"
+    };
+
+    // array for the options of the geography questions
+    strGeographyOptions = new String[][] {
+      {"A) Sydney", "B) Melbourne", "C) Canberra", "D) Brisbane"},
+      {"A) Nile", "B) Amazon", "C) Yangtze", "D) Mississippi"},
+      {"A) Kenya", "B) Uganda", "C) Tanzania", "D) South Africa"},
+      {"A) Monaco", "B) San Marino", "C) Vatican City", "D) Liechtenstein"},
+      {"A) Sahara", "B) Gobi", "C) Kalahari", "D) Arabian"},
+      {"A) Atlantic Ocean", "B) Indian Ocean", "C) Arctic Ocean", "D) Pacific Ocean"},
+      {"A) Spanish", "B) Portuguese", "C) English", "D) French"},
+      {"A) New South Wales", "B) Queensland", "C) Victoria", "D) Western Australia"},
+      {"A) India", "B) United States", "C) China", "D) Indonesia"},
+      {"A) Mount Whitney", "B) Mount McKinley (Denali)", "C) Mount Logan", "D) Mount Elbert"}
+    };
+
+    // array for the correct answer index for geography questions
+    intCorrectAnswerGeography = new int[]{2, 0, 2, 2, 0, 3, 1, 1, 2, 1};
   }
 
+  public void draw() {
+    if (intPage == 0) {
+      drawStartingPage();
+    } else {
+      drawQuestionPage();
+    }
+  }
 
   /**
    * Called repeatedly, anything drawn to the screen goes here
    */
-  public void draw() {
+  public void drawStartingPage() {
 
+    // draw the background
+    image(imgBackground, 0, 0);
+
+    textSize(50);
+    text("Select which topic you would like to play", 80, 100);
+
+    // print red button
+    fill(255, 0, 0);
+    rect(150, 150, 300, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("Geography", 250, 190);
+ 
+    // print green button
+    fill(0, 255, 0);
+    rect(600, 150, 300, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("History", 725, 190);
+ 
+    textSize(50);
+    text("Select the timer", 80, 280);
+
+    // print 2s button
+    fill(0, 0, 0);
+    rect(150, 300, 150, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("2s", 210, 330);
+
+    // print 5s button
+    fill(0, 0, 0);
+    rect(350, 300, 150, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("5s", 410, 330);
+
+    // print 10 button
+    fill(0, 0, 0);
+    rect(550, 300, 150, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("10s", 600, 330);    
+
+    // print next button
+    fill(0, 255, 255);
+    rect(400, 500, 300, 60, 30);
+    fill(255, 255, 255);
+    textSize(22);
+    text("Next Page", 500, 535);
+    // set timer
+  } 
+
+  /**
+   * Called repeatedly, anything drawn to the screen goes here
+   */
+  public void drawQuestionPage() {
+
+    delay(1000);
     // draw the background
     image(imgBackground, 0, 0);
 
     // print the questions
     fill(255);
-    textSize(30);
-    text(strHistoryQuestions[intQuestionNumber], 80, 80);
+    textSize(22);
+    if (intHistoryOrGeography == 0) {
+      text(strHistoryQuestions[intQuestionNumber], 80, 80);
+    } else {
+      text(strGeographyQuestions[intQuestionNumber], 80, 80);
+    }
     
     // print options
     int intTextPosition = 140;
     textSize(30);
     for (int intColumn = 0; intColumn < strHistoryOptions[0].length; intColumn++) {
-      text(strHistoryOptions[0][intColumn], 80, intTextPosition);
+      if (intHistoryOrGeography == 0) {
+        text(strHistoryOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+      } else {
+        text(strGeographyOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+      }
       intTextPosition += 30;
     }
     
@@ -116,6 +231,42 @@ public class Sketch extends PApplet {
     textSize(75);
     text("D", 725, 550);
 
+    // set timer
+  }
+
+  public void mousePressed() {
+    if (intPage == 0) {
+      mousePressedStartingPage();
+    } else {
+      mousePressedQuestionPage();
+    }
+  }
+
+  public void mousePressedStartingPage() {
+    // Georagphy
+    if ((mouseX >= 150 && mouseX <= 450) && (mouseY >= 150 && mouseY <= 210)) {
+      intHistoryOrGeography = 1;
+    } 
+    // history
+    else if  ((mouseX >= 600 && mouseX <= 900) && (mouseY >= 150 && mouseY <= 210)) {
+      intHistoryOrGeography = 0;
+    }
+    // 2s 
+    else if ((mouseX >= 150 && mouseX <= 300) && (mouseY >= 300 && mouseY <= 360)) {
+      intTimer = 2*1000;
+    } 
+    // 5s 
+    else if ((mouseX >= 350 && mouseX <= 500) && (mouseY >= 300 && mouseY <= 360)) {
+      intTimer = 5*1000;
+    }
+    // 10s
+    else if ((mouseX >= 550 && mouseX <= 700) && (mouseY >= 300 && mouseY <= 360)) {
+      intTimer = 10*1000;
+    }
+    // next page
+    else if ((mouseX >= 400 && mouseX <= 700) && (mouseY >= 500 && mouseY <= 560)) {
+      intPage = 1;
+    }
   }
 
   /**
@@ -123,7 +274,7 @@ public class Sketch extends PApplet {
    * @Author Steve Lin
    * @return
    */
-  public void mousePressed() {
+  public void mousePressedQuestionPage() {
     
     int intSelectedOption = 4;
 
@@ -147,18 +298,32 @@ public class Sketch extends PApplet {
     if (intSelectedOption != 4){
       if (intSelectedOption == intCorrectAnswersHistory[intQuestionNumber]){
 
-        textSize(100);
-        text("CORRECT", 80, 80);
+        textSize(20);
+        text("CORRECT", 450, 180);
+
+        intQuestionNumber++;
+        intScore++;
 
       }
       else {
 
-        textSize(30);
-        text("INCORRECT", 80, 80);
+        textSize(20);
+        text("INCORRECT", 450, 180);
+        
+        intQuestionNumber++;
       }
-    }
+      if (intHistoryOrGeography == 0) {
+        if (intQuestionNumber >= strHistoryQuestions.length) {
+          text("Your text score is " + intScore, 450, 220);
+        }
+      }
+      else {
+        if (intQuestionNumber >= strGeographyQuestions.length) {
+          text("Your text score is " + intScore, 450, 220);
+        }
+      }
 
-    
+    }
   }
 
   // define other methods down here.
