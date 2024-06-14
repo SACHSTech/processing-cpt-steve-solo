@@ -19,7 +19,9 @@ public class Sketch extends PApplet {
 
   int intPage = 0;
   int intHistoryOrGeography = 0; // 0 - history; 1 - geography
-  int intTimer = 0;
+  int intTimer = 2000;
+  int previousTime = 0;
+  boolean pauseTimer = false;
 
   /**
    * Called once at the beginning of execution, put your size call here
@@ -107,11 +109,18 @@ public class Sketch extends PApplet {
   }
 
   public void draw() {
-    if (intPage == 0) {
-      drawStartingPage();
-    } else {
-      drawQuestionPage();
+    switch(intPage) {
+      case 0:
+        drawStartingPage();
+        break;
+      case 1:
+        drawQuestionPage();
+        break;
+      case 2:
+        drawFinalPage();
+        break;
     }
+  
   }
 
   /**
@@ -172,14 +181,65 @@ public class Sketch extends PApplet {
     // set timer
   } 
 
+  public void drawFinalPage() {
+    intHistoryOrGeography = 0; 
+    intTimer = 2000;
+    intQuestionNumber = 0;
+    image(imgBackground, 0, 0);
+
+    // print the questions
+    fill(255);
+    textSize(50);
+    text("Your score is " + intScore, 200, 220);
+    
+    // print red button
+    fill(255, 0, 0);
+    rect(200, 300, 200, 100, 30);
+    fill(255, 255, 255);
+    textSize(30);
+    text("Play again", 230, 350);
+
+    // print green button
+    fill(0, 255, 0);
+    rect(600, 300, 200, 100, 30);
+    fill(255, 255, 255);
+    textSize(30);
+    text("Quit", 670, 350);
+
+  }
+
   /**
    * Called repeatedly, anything drawn to the screen goes here
    */
   public void drawQuestionPage() {
-
-    delay(1000);
     // draw the background
     image(imgBackground, 0, 0);
+
+    if (pauseTimer == true) {
+      delay(1000);
+      previousTime = previousTime + 1000;
+      pauseTimer = false;
+    }
+
+    int currentTime = millis();
+    textSize(30);
+    
+    String strTimer = nf(currentTime - previousTime, 4);
+    System.out.println("++++"+strTimer);
+    text( strTimer, 700, 100 );
+    
+    if ((currentTime - previousTime) > intTimer) {
+      textSize(20);
+      text("Time is up, move to next question", 450, 180);
+      pauseTimer = true;
+      intQuestionNumber++;
+      if (areQuestionsFinished() == true) {
+        delay(1000);
+        intPage = 2;
+      }
+      previousTime = millis();
+      return;
+    }
 
     // print the questions
     fill(255);
@@ -235,10 +295,16 @@ public class Sketch extends PApplet {
   }
 
   public void mousePressed() {
-    if (intPage == 0) {
-      mousePressedStartingPage();
-    } else {
-      mousePressedQuestionPage();
+    switch(intPage) {
+      case 0:
+        mousePressedStartingPage();
+        break;
+      case 1:
+        mousePressedQuestionPage();
+        break;
+      case 2:
+        mousePressedFinalPage();
+        break;
     }
   }
 
@@ -266,6 +332,7 @@ public class Sketch extends PApplet {
     // next page
     else if ((mouseX >= 400 && mouseX <= 700) && (mouseY >= 500 && mouseY <= 560)) {
       intPage = 1;
+      previousTime = millis();
     }
   }
 
@@ -296,6 +363,7 @@ public class Sketch extends PApplet {
     }
 
     if (intSelectedOption != 4){
+      
       if (intSelectedOption == intCorrectAnswersHistory[intQuestionNumber]){
 
         textSize(20);
@@ -312,19 +380,36 @@ public class Sketch extends PApplet {
         
         intQuestionNumber++;
       }
-      if (intHistoryOrGeography == 0) {
-        if (intQuestionNumber >= strHistoryQuestions.length) {
-          text("Your text score is " + intScore, 450, 220);
-        }
+      if (areQuestionsFinished() == true) {
+        intPage = 2;
       }
-      else {
-        if (intQuestionNumber >= strGeographyQuestions.length) {
-          text("Your text score is " + intScore, 450, 220);
-        }
-      }
-
+      pauseTimer = true;
+      previousTime = millis();
     }
   }
 
-  // define other methods down here.
+  public void mousePressedFinalPage() {
+    // Play again
+    if ((mouseX >= 200 && mouseX <= 400) && (mouseY >= 300 && mouseY <= 400)) {
+      intPage = 0;
+    } 
+    // quit
+    else if ((mouseX >= 600 && mouseX <= 800) && (mouseY >= 300 && mouseY <= 400)) {
+      exit();
+    } 
+  }
+
+  public boolean areQuestionsFinished() {
+    if (intHistoryOrGeography == 0) {
+      if (intQuestionNumber >= strHistoryQuestions.length) {
+        return true;
+      }
+    }
+    else {
+      if (intQuestionNumber >= strGeographyQuestions.length) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
