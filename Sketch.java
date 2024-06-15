@@ -5,6 +5,8 @@ public class Sketch extends PApplet {
 
   // define variables
   PImage imgBackground;
+  PImage imgOpeningBackground;
+  PImage imgTopicsBackground;
 
   String[] strHistoryQuestions;
   String[][] strHistoryOptions;
@@ -21,7 +23,7 @@ public class Sketch extends PApplet {
   int intHistoryOrGeography = 0; // 0 - history; 1 - geography
   int intTimer = 2000;
   int previousTime = 0;
-  boolean pauseTimer = false;
+  boolean blnPauseTimer = false;
 
   /**
    * Called once at the beginning of execution, put your size call here
@@ -109,16 +111,21 @@ public class Sketch extends PApplet {
   }
 
   public void draw() {
-    switch(intPage) {
-      case 0:
-        drawStartingPage();
-        break;
-      case 1:
-        drawQuestionPage();
-        break;
-      case 2:
-        drawFinalPage();
-        break;
+
+    if (intPage == 0){
+      drawOpeningPage();
+    }
+    if (intPage == 1) {
+      drawTopicsPage();
+    }
+    if (intPage == 2) {
+      drawStartingPage();
+    }
+    if (intPage == 3) {
+      drawQuestionPage();
+    }
+    if (intPage == 4) {
+      drawFinalPage();
     }
   
   }
@@ -126,6 +133,20 @@ public class Sketch extends PApplet {
   /**
    * Called repeatedly, anything drawn to the screen goes here
    */
+
+  public void drawOpeningPage() {
+    imgOpeningBackground = loadImage("Opening Page.jpg");
+
+    image(imgOpeningBackground, 0, 0);
+
+  }
+
+  public void drawTopicsPage() {
+
+    imgTopicsBackground = loadImage ("History.jpg");
+
+    image(imgTopicsBackground, 0, 0);
+  }
   public void drawStartingPage() {
 
     // draw the background
@@ -215,23 +236,24 @@ public class Sketch extends PApplet {
     // draw the background
     image(imgBackground, 0, 0);
 
-    if (pauseTimer == true) {
+    if (blnPauseTimer == true) {
       delay(1000);
       previousTime = previousTime + 1000;
-      pauseTimer = false;
+      blnPauseTimer = false;
     }
 
-    int currentTime = millis();
+    int intCurrentTime = millis();
     textSize(30);
     
-    String strTimer = nf(currentTime - previousTime, 4);
+    String strTimer = nf(intCurrentTime - previousTime, 4);
     System.out.println("++++"+strTimer);
-    text( strTimer, 700, 100 );
+    textSize(50);
+    text(strTimer, 880, 60);
     
-    if ((currentTime - previousTime) > intTimer) {
+    if ((intCurrentTime - previousTime) > intTimer) {
       textSize(20);
       text("Time is up, move to next question", 450, 180);
-      pauseTimer = true;
+      blnPauseTimer = true;
       intQuestionNumber++;
       if (areQuestionsFinished() == true) {
         delay(1000);
@@ -295,17 +317,31 @@ public class Sketch extends PApplet {
   }
 
   public void mousePressed() {
-    switch(intPage) {
-      case 0:
-        mousePressedStartingPage();
-        break;
-      case 1:
-        mousePressedQuestionPage();
-        break;
-      case 2:
-        mousePressedFinalPage();
-        break;
+    
+    if (intPage == 0) {
+      mousePressedOpeningPage();
     }
+    //if (intPage == 1) {
+      
+    //}
+    if (intPage == 2) {
+      mousePressedStartingPage();
+    }
+    if (intPage == 3) {
+      mousePressedQuestionPage();
+    }
+    if (intPage == 4) {
+      mousePressedFinalPage(); 
+    }
+      
+  }
+
+  public void mousePressedOpeningPage() {
+    intPage = 1;
+  }
+
+  public void mousePressedTopicsPage(){
+
   }
 
   public void mousePressedStartingPage() {
@@ -331,7 +367,7 @@ public class Sketch extends PApplet {
     }
     // next page
     else if ((mouseX >= 400 && mouseX <= 700) && (mouseY >= 500 && mouseY <= 560)) {
-      intPage = 1;
+      intPage = 3;
       previousTime = millis();
     }
   }
@@ -381,9 +417,9 @@ public class Sketch extends PApplet {
         intQuestionNumber++;
       }
       if (areQuestionsFinished() == true) {
-        intPage = 2;
+        intPage = 4;
       }
-      pauseTimer = true;
+      blnPauseTimer = true;
       previousTime = millis();
     }
   }
@@ -391,7 +427,7 @@ public class Sketch extends PApplet {
   public void mousePressedFinalPage() {
     // Play again
     if ((mouseX >= 200 && mouseX <= 400) && (mouseY >= 300 && mouseY <= 400)) {
-      intPage = 0;
+      intPage = 1;
     } 
     // quit
     else if ((mouseX >= 600 && mouseX <= 800) && (mouseY >= 300 && mouseY <= 400)) {
