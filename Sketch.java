@@ -3,34 +3,39 @@ import processing.core.PImage;
 
 public class Sketch extends PApplet {
 
-  // define variables
+  // define image variables
   PImage imgBackground;
   PImage imgOpeningBackground;
   PImage imgTopicsBackground;
   PImage imgTimerBackground;
   PImage imgEndingBackground;
 
+  // define history variables
   String[] strHistoryQuestions;
   String[][] strHistoryOptions;
   int[] intCorrectAnswersHistory;
   int intQuestionNumber;
 
   int intScore;
+  int intPage = 0;
+  int intHistoryOrGeography = 0; 
 
+  // define geography variables
   String[] strGeographyQuestions;
   String[][] strGeographyOptions;
   int[] intCorrectAnswerGeography;
 
+  // define pop culture variables
   String[] strPopQuestions;
   String[][] strPopOptions;
   int[] intCorrectAnswerPop;
 
+  // define mixed questions variables
   String[] strMixedQuestions;
   String[][] strMixedOptions;
   int[] intCorrectAnswerMixed;
 
-  int intPage = 0;
-  int intHistoryOrGeography = 0; 
+  // define timer variables
   int intTimer = 2000;
   int intPreviousTime = 0;
   boolean blnPauseTimer = false;
@@ -39,7 +44,6 @@ public class Sketch extends PApplet {
    * Called once at the beginning of execution, put your size call here
    */
   public void settings() {
-    // put your size call here
     size(1000, 600);
   }
 
@@ -76,7 +80,7 @@ public class Sketch extends PApplet {
       {"A) Persian Empire", "B) Mongol Empire", "C) Ottoman Empire", "D) Byzantine Empire"},
       {"A) Benjamin Franklin", "B) John Adams", "C) Thomas Jefferson", "D) James Madison"}
     };
-
+    
     // array of list of correct answers in accordance to index
     intCorrectAnswersHistory = new int[]{0, 2, 1, 2, 2, 1, 1, 0, 1, 2};
 
@@ -173,12 +177,17 @@ public class Sketch extends PApplet {
       {"a) China", "b) United Kingdom", "c) Brazil", "d) Japan"}
     };
     
+    // array of answers for mixed questions
     intCorrectAnswerMixed = new int[]{1, 1, 2, 3, 2, 2, 2, 1, 0, 2};
 
   }
 
+  /**
+   * Called repeatedly, anything drawn to the screen goes here
+   */
   public void draw() {
 
+    // if statement that switch the pages
     if (intPage == 0){
       drawOpeningPage();
     }
@@ -194,78 +203,77 @@ public class Sketch extends PApplet {
     else if (intPage == 4) {
       drawFinalPage();
     }
-  
+
   }
 
   /**
-   * Called repeatedly, anything drawn to the screen goes here
+   * Draws the starting page
    */
-
   public void drawOpeningPage() {
     imgOpeningBackground = loadImage("Opening Page.jpg");
-
     image(imgOpeningBackground, 0, 0);
-
-  }
-
-  public void drawTopicsPage() {
-
-    imgTopicsBackground = loadImage ("Mode Page.jpg");
-
-    image(imgTopicsBackground, 0, 0);
-
-  }
-
-  public void drawTimerPage() {
-
-    imgTimerBackground = loadImage ("Difficulty Page.jpg");
-
-    image(imgTimerBackground, 0, 0);
-
   }
 
   /**
-   * Called repeatedly, anything drawn to the screen goes here
+   * Draws the topic selection page
+   */
+  public void drawTopicsPage() {
+    imgTopicsBackground = loadImage ("Mode Page.jpg");
+    image(imgTopicsBackground, 0, 0);
+  }
+
+  /**
+   * Draws the difficulty selection page
+   */
+  public void drawTimerPage() {
+    imgTimerBackground = loadImage ("Difficulty Page.jpg");
+    image(imgTimerBackground, 0, 0);
+  }
+
+  /**
+   * Draws the question page with the timer 
    */
   public void drawQuestionPage() {
 
-    // load image
-    imgBackground = loadImage("Questions Page.jpg");
-
     // draw the background
+    imgBackground = loadImage("Questions Page.jpg");
     image(imgBackground, 0, 0);
 
+    // // If the timer is paused, delay for 1 second, update intPreviousTime, and reset blnPauseTimer
     if (blnPauseTimer) {
       delay(1000);
       intPreviousTime += 1000;
       blnPauseTimer = false;
     }
 
-    
-
-
+    // if timer is greater than 0
     if (intTimer > 0) {
-      int intCurrentTime = millis();
+      int intCurrentTime = millis(); // gets the millisecond instant of the clock
+      // calculates elapsed time and converts it to seconds
       int intElapsedSeconds = (int) ((intCurrentTime - intPreviousTime) / 1000); 
       textSize(50);
-      text(intElapsedSeconds, 880, 60); 
+      text(intElapsedSeconds, 887, 110); 
+
+      // indicates when the the the time limit is passed & moves on to the next question
       if (intElapsedSeconds > intTimer / 1000) { 
         textSize(30);
         text("Time is up, move to next question!", 80, 160);
         blnPauseTimer = true;
         intQuestionNumber++;
+
+        // switches to ending page if the questions are answered
         if (areQuestionsFinished()) {
           delay(1000);
           intPage = 4;
         }
+
+        // get the current millisecond instant of the block
         intPreviousTime = millis();
         return;
       }
     }
 
-  
-
-    // print the questions
+    // print the questions to the screen
     fill(255);
     textSize(22);
     if (intHistoryOrGeography == 0) {
@@ -281,7 +289,7 @@ public class Sketch extends PApplet {
       text(strMixedQuestions[intQuestionNumber], 80, 80);
     }
     
-    // print options
+    // print the options to the screen
     int intTextPosition = 140;
     textSize(20);
     for (int intColumn = 0; intColumn < strHistoryOptions[0].length; intColumn++) {
@@ -299,19 +307,23 @@ public class Sketch extends PApplet {
       }
       intTextPosition += 30;
     }
-
   }
 
+  /**
+   * Draw the final page with percentage achieved
+   */
   public void drawFinalPage() {
 
+    // print background image
     imgEndingBackground = loadImage ("Ending Page.jpg");
     image(imgEndingBackground, 0, 0);
-
+    
+    // reinitializing variables
     intHistoryOrGeography = 0; 
     intTimer = 2000;
     intQuestionNumber = 0;
 
-    // print the questions
+    // the score achieved as a percent
     fill(255);
     textSize(50);
     if (intScore == 0) {
@@ -322,8 +334,12 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * 
+   */
   public void mousePressed() {
     
+    // gets methods based on page number
     if (intPage == 0) {
       mousePressedOpeningPage();
     }
@@ -339,68 +355,55 @@ public class Sketch extends PApplet {
     else if (intPage == 4) {
       mousePressedFinalPage(); 
     }
-      
   }
 
   public void mousePressedOpeningPage() {
-
     intPage = 1;
   }
 
   public void mousePressedTopicsPage(){
 
+    // History button
     if ((mouseX >= 210 && mouseX <= 310) && (mouseY >= 232 && mouseY <= 332)) {
-
       intHistoryOrGeography = 0;
-
       intPage = 2;
     }
+    // Geography button
     if ((mouseX >= 351 && mouseX <= 451) && (mouseY >= 232 && mouseY <= 332)) {
-
       intHistoryOrGeography = 1;
-
       intPage = 2;
     }
+    // Pop Culture button
     if ((mouseX >= 495 && mouseX <= 595) && (mouseY >= 232 && mouseY <= 332)) {
-
       intHistoryOrGeography = 2;
-
       intPage = 2;
-
     }
+    // Mixed questions button
     if ((mouseX >= 640 && mouseX <= 740) && (mouseY >= 232 && mouseY <= 332)) {
-
       intHistoryOrGeography = 3;
-
       intPage = 2;
-
     }
-
   }
 
   public void mousePressedTimerPage() {
 
+    // 5 second timer button
     if ((mouseX >= 248 && mouseX <= 398) && (mouseY >= 265 && mouseY <= 345)){
-
       intPage = 3;
       intTimer = 5 * 1000;
-
     }
-
+    // 10 second timer button
     if((mouseX >= 424 && mouseX <= 574) && (mouseY >= 265 && mouseY <= 345)) {
-      
       intPage = 3;
       intTimer = 10 * 1000;
-
     }
-
+    // unlimited timer button
     if((mouseX >= 600 && mouseX <= 750) && (mouseY >= 265 && mouseY <= 345)) {
-
       intPage = 3;
       intTimer = -1;
-
     }
     
+    // Get the current millisecond instant of the clock
     intPreviousTime = millis();
 
   }
@@ -408,9 +411,7 @@ public class Sketch extends PApplet {
 
 
   /**
-   * Check if buttons are pressed and indicates if the correct is chosen
-   * @Author Steve Lin
-   * @return
+   * Indicates which option is 
    */
   public void mousePressedQuestionPage() {
     
@@ -435,6 +436,7 @@ public class Sketch extends PApplet {
 
     if (intSelectedOption != 4){
       
+      // prints correct, adds a score point, and moves to next question if question is answer right
       if (intSelectedOption == intCorrectAnswersHistory[intQuestionNumber]){
 
         textSize(20);
@@ -444,6 +446,7 @@ public class Sketch extends PApplet {
         intScore++;
 
       }
+      // prints incorrect and moves to the next question without adding a score point
       else {
 
         textSize(20);
@@ -451,38 +454,56 @@ public class Sketch extends PApplet {
         
         intQuestionNumber++;
       }
+      // moves to final page if questions are finished
       if (areQuestionsFinished() == true) {
         intPage = 4;
       }
+      // pauses timer when question is answered
       blnPauseTimer = true;
       intPreviousTime = millis();
     }
   }
 
   public void mousePressedFinalPage() {
-    // Play again
+    // Play again button moves player to first page if pressed
     if ((mouseX >= 385 && mouseX <= 615) && (mouseY >= 327 && mouseY <= 387)) {
       intPage = 1;
     } 
-    // quit
+    // program is terminated if quit button is selected
     else if ((mouseX >= 385 && mouseX <= 615) && (mouseY >= 410 && mouseY <= 470)) {
       exit();
     } 
   }
 
+  /**
+   * Determines if the questionaire is completed
+   * @return true if the current question number is larger or equal to the number of elements in the questions array
+   * @return false if the number of elements in the questions array is larger than current question number
+   */
   public boolean areQuestionsFinished() {
-    if (intHistoryOrGeography == 0) {
-      if (intQuestionNumber >= strHistoryQuestions.length) {
-        return true;
-      }
+      
+    // returns true if question number surpasses the length of the history questions array
+    if (intQuestionNumber >= strHistoryQuestions.length) {
+      return true;
     }
     else {
-      if (intQuestionNumber >= strGeographyQuestions.length) {
-        return true;
-      }
+      // returns false if the questions array is larger than the current question number
+      return false;
     }
-    return false;
+
   }
 
-
+  public int[] shuffle(String[] questions) {
+    int[] indices = new int[questions.length];
+    for (int i = 0; i < indices.length; i++) {
+      indices[i] = i;
+    }
+    for (int i = 0; i < indices.length; i++) {
+      int index = (int)random(indices.length);
+      int temp = indices[index];
+      indices[index] = indices[i];
+      indices[i] = temp;
+    }
+    return indices;
+  }
 }
