@@ -20,6 +20,9 @@ Timer selection page
 ![alt text](<Screen Shot 2024-06-16 at 5.52.38 PM.png>)
 Question answering page
 
+<img width="996" alt="Screen Shot 2024-06-17 at 1 51 38 PM" src="https://github.com/SACHSTech/processing-cpt-steve-solo/assets/159297804/f8e437e9-32aa-4475-9eb2-059fd3c11317">
+Prints incorrect if the incorrect answer is selected
+
 ![alt text](<Screen Shot 2024-06-16 at 5.53.01 PM.png>)
 Prints correct if the correct answer is selected
 
