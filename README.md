@@ -14,7 +14,7 @@ Opening page
 ![alt text](<Screen Shot 2024-06-16 at 5.51.55 PM.png>)
 Topic selection page
 
-![alt text](<Screen Shot 2024-06-16 at 5.51.55 PM-1.png>) ![alt text](<Screen Shot 2024-06-16 at 5.52.13 PM.png>)
+![alt text](<Screen Shot 2024-06-16 at 5.51.55 PM-1.png>) 
 Timer selection page
 
 ![alt text](<Screen Shot 2024-06-16 at 5.52.38 PM.png>)
