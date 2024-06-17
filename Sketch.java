@@ -35,6 +35,8 @@ public class Sketch extends PApplet {
   String[][] strMixedOptions;
   int[] intCorrectAnswerMixed;
 
+  int[] intRandomizedIndex = null;
+
   // define timer variables
   int intTimer = 2000;
   int intPreviousTime = 0;
@@ -179,7 +181,6 @@ public class Sketch extends PApplet {
     
     // array of answers for mixed questions
     intCorrectAnswerMixed = new int[]{1, 1, 2, 3, 2, 2, 2, 1, 0, 2};
-
   }
 
   /**
@@ -187,7 +188,7 @@ public class Sketch extends PApplet {
    */
   public void draw() {
 
-    // if statement that switch the pages
+    // if statement that switch the pages in an ordered sequence
     if (intPage == 0){
       drawOpeningPage();
     }
@@ -206,33 +207,32 @@ public class Sketch extends PApplet {
 
   }
 
-  /**
-   * Draws the starting page
-   */
+  // draws the first page
   public void drawOpeningPage() {
+
     imgOpeningBackground = loadImage("Opening Page.jpg");
     image(imgOpeningBackground, 0, 0);
+
   }
 
-  /**
-   * Draws the topic selection page
-   */
+  // draws the page that displays options of topics
   public void drawTopicsPage() {
+
     imgTopicsBackground = loadImage ("Mode Page.jpg");
     image(imgTopicsBackground, 0, 0);
+
   }
 
-  /**
-   * Draws the difficulty selection page
-   */
+  // draws the page that displays timer options
   public void drawTimerPage() {
+
     imgTimerBackground = loadImage ("Difficulty Page.jpg");
     image(imgTimerBackground, 0, 0);
+    intScore = 0;
+
   }
 
-  /**
-   * Draws the question page with the timer 
-   */
+  // draws the page with the questions and displays the timer
   public void drawQuestionPage() {
 
     // draw the background
@@ -267,26 +267,29 @@ public class Sketch extends PApplet {
           intPage = 4;
         }
 
-        // get the current millisecond instant of the block
+        // get the current millisecond instant of the clock
         intPreviousTime = millis();
         return;
       }
     }
 
-    // print the questions to the screen
     fill(255);
     textSize(22);
+    
+    // reference randomized index to look up next question
+    int indexOfNextQuetion = intRandomizedIndex[intQuestionNumber];
+    // prints the questions to the screen
     if (intHistoryOrGeography == 0) {
-      text(strHistoryQuestions[intQuestionNumber], 80, 80);
+      text(strHistoryQuestions[indexOfNextQuetion], 80, 80);
     } 
     else if(intHistoryOrGeography == 1) {
-      text(strGeographyQuestions[intQuestionNumber], 80, 80);
+      text(strGeographyQuestions[indexOfNextQuetion], 80, 80);
     }
     else if(intHistoryOrGeography == 2) {
-      text(strPopQuestions[intQuestionNumber], 80, 80);
+      text(strPopQuestions[indexOfNextQuetion], 80, 80);
     }
     else if(intHistoryOrGeography == 3) {
-      text(strMixedQuestions[intQuestionNumber], 80, 80);
+      text(strMixedQuestions[indexOfNextQuetion], 80, 80);
     }
     
     // print the options to the screen
@@ -294,24 +297,22 @@ public class Sketch extends PApplet {
     textSize(20);
     for (int intColumn = 0; intColumn < strHistoryOptions[0].length; intColumn++) {
       if (intHistoryOrGeography == 0) {
-        text(strHistoryOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+        text(strHistoryOptions[indexOfNextQuetion][intColumn], 80, intTextPosition);
       } 
       else if (intHistoryOrGeography == 1) {
-        text(strGeographyOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+        text(strGeographyOptions[indexOfNextQuetion][intColumn], 80, intTextPosition);
       }
       else if(intHistoryOrGeography == 2) {
-        text(strPopOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+        text(strPopOptions[indexOfNextQuetion][intColumn], 80, intTextPosition);
       }
       else if(intHistoryOrGeography == 3) {
-        text(strMixedOptions[intQuestionNumber][intColumn], 80, intTextPosition);
+        text(strMixedOptions[indexOfNextQuetion][intColumn], 80, intTextPosition);
       }
       intTextPosition += 30;
     }
   }
 
-  /**
-   * Draw the final page with percentage achieved
-   */
+  // draws the final page that displays the score & buttons for playing again or quiting the game
   public void drawFinalPage() {
 
     // print background image
@@ -334,12 +335,9 @@ public class Sketch extends PApplet {
     }
   }
 
-  /**
-   * 
-   */
   public void mousePressed() {
     
-    // gets methods based on page number
+    // references the mousepressed methods that correspond to each page
     if (intPage == 0) {
       mousePressedOpeningPage();
     }
@@ -357,10 +355,12 @@ public class Sketch extends PApplet {
     }
   }
 
+  // Indicates if the screen is pressed on the opening page
   public void mousePressedOpeningPage() {
     intPage = 1;
   }
 
+  // Indicates the buttons that are pressed on the topic selection page
   public void mousePressedTopicsPage(){
 
     // History button
@@ -385,6 +385,7 @@ public class Sketch extends PApplet {
     }
   }
 
+  // Indicates the buttons that are pressed on the timer selection page
   public void mousePressedTimerPage() {
 
     // 5 second timer button
@@ -402,42 +403,81 @@ public class Sketch extends PApplet {
       intPage = 3;
       intTimer = -1;
     }
+
+    // creates an array of randomized indexes that will randomize the order of the questions
+    if (intHistoryOrGeography == 0) { 
+      // randomizes the geography questions
+      intRandomizedIndex = shuffle(strGeographyQuestions);
+    } else if (intHistoryOrGeography == 1) {
+      // randomizes the history questions
+      intRandomizedIndex = shuffle(strHistoryQuestions);
+    } else if (intHistoryOrGeography == 2) {
+      // randomizes the pop culture questions 
+      intRandomizedIndex = shuffle(strPopQuestions);
+    } else if (intHistoryOrGeography == 3) {
+      // randomizes the mixed questions
+      intRandomizedIndex = shuffle(strMixedQuestions);
+    }
     
     // Get the current millisecond instant of the clock
     intPreviousTime = millis();
 
   }
 
-
-
-  /**
-   * Indicates which option is 
-   */
+  // Indicates the buttons that are pressed on the questions page
   public void mousePressedQuestionPage() {
     
     int intSelectedOption = 4;
 
-    // chained conditionals that indicates which button is pressed
+    // indicates which button is pressed
     if ((mouseX >= 0 && mouseX <= 500) && (mouseY >= 300 && mouseY <= 450)) {
-      intSelectedOption = 0; // A
+      intSelectedOption = 0; // if option A is selected
     } 
     
     else if ((mouseX >= 500 && mouseX <= 1000) && (mouseY >= 300 && mouseY <= 450)) {
-      intSelectedOption = 1; // B
+      intSelectedOption = 1; // if option B is selected
     }
      
     else if ((mouseX >= 0 && mouseX <= 500) && (mouseY >= 450 && mouseY <= 600)) {
-      intSelectedOption = 2; // C
+      intSelectedOption = 2; // if option C is selected
     } 
     
     else if ((mouseX >= 500 && mouseX <= 1000) && (mouseY >= 450 && mouseY <= 600)) {
-      intSelectedOption = 3; // D
+      intSelectedOption = 3; // if option D is selected
     }
 
-    if (intSelectedOption != 4){
-      
+    boolean blnCorrect = false;
+
+    // checks if the correct answers of the randomized index questions are selected
+    int intIndex = intRandomizedIndex[intQuestionNumber];
+    if (intSelectedOption != 4) {
+      // check if answers are correct for history
+      if (intHistoryOrGeography == 0) {
+        if (intSelectedOption == intCorrectAnswersHistory[intIndex]) {
+          blnCorrect = true;
+        }
+      }
+      // check if answers are correct for georgraphy
+      else if (intHistoryOrGeography == 1) {
+          if (intSelectedOption == intCorrectAnswerGeography[intIndex]) {
+          blnCorrect = true;
+        }
+      } 
+      // check if answers correct for pop culture
+      else if (intHistoryOrGeography == 2) {
+        if (intSelectedOption == intCorrectAnswerPop[intIndex]) {
+          blnCorrect = true;
+        }
+      } 
+       // check if answers are correct for mixed 
+      else if (intHistoryOrGeography == 3) {
+        if (intSelectedOption == intCorrectAnswerMixed[intIndex]) {
+          blnCorrect = true;
+        }
+      }
+
       // prints correct, adds a score point, and moves to next question if question is answer right
-      if (intSelectedOption == intCorrectAnswersHistory[intQuestionNumber]){
+      if (blnCorrect == true){
 
         textSize(20);
         text("CORRECT", 450, 180);
@@ -454,7 +494,7 @@ public class Sketch extends PApplet {
         
         intQuestionNumber++;
       }
-      // moves to final page if questions are finished
+      // moves to final page if all questions are finished
       if (areQuestionsFinished() == true) {
         intPage = 4;
       }
@@ -464,6 +504,7 @@ public class Sketch extends PApplet {
     }
   }
 
+  // Indicates the buttons that are pressed on the final page
   public void mousePressedFinalPage() {
     // Play again button moves player to first page if pressed
     if ((mouseX >= 385 && mouseX <= 615) && (mouseY >= 327 && mouseY <= 387)) {
@@ -482,28 +523,68 @@ public class Sketch extends PApplet {
    */
   public boolean areQuestionsFinished() {
       
-    // returns true if question number surpasses the length of the history questions array
-    if (intQuestionNumber >= strHistoryQuestions.length) {
-      return true;
+    if (intHistoryOrGeography == 0) {
+      // returns true if question number surpasses the length of the history questions array
+      if (intQuestionNumber >= strHistoryQuestions.length) {
+        return true;
+      }
+      else {
+        // returns false if the questions array is larger than the current question number
+        return false;
+      }
+    } else if (intHistoryOrGeography == 1) {
+      // returns true if question number surpasses the length of the geography questions array
+      if (intQuestionNumber >= strGeographyQuestions.length) {
+        return true;
+      }
+      else {
+        // returns false if the questions array is larger than the current question number
+        return false;
+      }
+    } else if (intHistoryOrGeography == 2) {
+      // returns true if question number surpasses the length of the pop questions array
+      if (intQuestionNumber >= strPopQuestions.length) {
+        return true;
+      }
+      else {
+        // returns false if the questions array is larger than the current question number
+        return false;
+      }
+    } else if (intHistoryOrGeography == 3) {
+      // returns true if question number surpasses the length of the mixed questions array
+      if (intQuestionNumber >= strMixedQuestions.length) {
+        return true;
+      }
+      else {
+        // returns false if the questions array is larger than the current question number
+        return false;
+      }
     }
-    else {
-      // returns false if the questions array is larger than the current question number
-      return false;
-    }
-
+    return true;
   }
 
+  /**
+   * Shuffles the index of the questions array
+   * @param questions the array of questions
+   * @return indices the array of index after shuffling
+   */
   public int[] shuffle(String[] questions) {
     int[] indices = new int[questions.length];
+    // initialize the default index array 
     for (int i = 0; i < indices.length; i++) {
       indices[i] = i;
     }
     for (int i = 0; i < indices.length; i++) {
-      int index = (int)random(indices.length);
-      int temp = indices[index];
-      indices[index] = indices[i];
+      // generate a random number less than the length of the array
+      int rand = (int)random(indices.length);
+      // use temp variable to store the random index
+      int temp = indices[rand];
+      // assign current index to the random index 
+      indices[rand] = indices[i];
+      // assign the random index with the old index
       indices[i] = temp;
     }
+    // return an array of randomnized index
     return indices;
   }
 }
